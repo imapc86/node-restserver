@@ -1,63 +1,84 @@
 /**
-* Función que verifica el token enviado
-*/
+ * Función que verifica el token enviado
+ */
 
 const jwt = require('jsonwebtoken');
 
 
-let verificaToken = (req, res, next) =>{
+let verificaToken = (req, res, next) => {
 
-	let token = req.get('token'); 
+    let token = req.get('token');
 
-	jwt.verify(token, process.env.SEED, (err, decoded)=>{
+    jwt.verify(token, process.env.SEED, (err, decoded) => {
 
-		if (err) {
-			return res.status(401).json({
-						ok: false,
-						err: {
-							message: "Token no valido"
-						}
-					});
-		}
+        if (err) {
+            return res.status(401).json({
+                ok: false,
+                err: {
+                    message: "Token no valido"
+                }
+            });
+        }
 
-		req.usuario = decoded.usuario;
+        req.usuario = decoded.usuario;
 
-		next();
+        next();
 
-	});
+    });
 
 };
 
 
 /**
-* Verfifica el ADMIN_ROLE
-*/
+ * Verfifica el ADMIN_ROLE
+ */
 
 let verificaAdmin_role = (req, res, next) => {
 
-	let usuario = req.usuario
+    let usuario = req.usuario;
 
-	if (usuario.role == 'ADMIN_ROLE') {
-		
-		next();
+    if (usuario.role == 'ADMIN_ROLE') {
 
-	}else{
+        next();
 
-		return res.json({
-				ok: false,
-				err: {
-					message: "El usuario no es administrador"
-				}
-			});
-		
-	}
+    } else {
 
+        return res.json({
+            ok: false,
+            err: {
+                message: "El usuario no es administrador"
+            }
+        });
 
-
+    }
 };
 
+/**
+ * Verfifica token para imagen
+ */
+
+let verificaTokenImg = (req, res, next) => {
+
+    let token = req.query.token;
+
+    jwt.verify(token, process.env.SEED, (err, decoded) => {
+
+        if (err) {
+            return res.status(401).json({
+                ok: false,
+                err: {
+                    message: "Token no valido"
+                }
+            });
+        }
+
+        req.usuario = decoded.usuario;
+        next();
+    });
+};
 
 module.exports = {
-	verificaToken,
-	verificaAdmin_role
+    verificaToken,
+    verificaAdmin_role,
+    verificaTokenImg
 }
